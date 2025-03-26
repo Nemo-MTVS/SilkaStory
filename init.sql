@@ -50,6 +50,7 @@ CREATE TABLE `users` (
                          `updatedAt` DATETIME NOT NULL COMMENT '수정일',
                          `deletedAt` DATETIME COMMENT '삭제일',
                          `isUsed` BOOLEAN NOT NULL COMMENT '삭제상태',
+                         UNIQUE KEY `uk_users_nickname` (`nickname`),
                          PRIMARY KEY (`id`)
 ) COMMENT = '회원';
 
