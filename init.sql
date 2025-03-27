@@ -56,7 +56,7 @@ CREATE TABLE `users` (
 
 -- 2. categories
 CREATE TABLE `categories` (
-                              `id` BIGINT NOT NULL COMMENT '카테고리 식별값',
+                              `id` BIGINT AUTO_INCREMENT NOT NULL COMMENT '카테고리 식별값',
                               `name` VARCHAR(100) NOT NULL COMMENT '카테고리 제목',
                               `depth` INTEGER NOT NULL COMMENT '카테고리 깊이',
 #                               `createdAt` DATETIME NOT NULL COMMENT '생성일',
@@ -72,7 +72,7 @@ CREATE TABLE `categories` (
 
 -- 3. posts
 CREATE TABLE `posts` (
-                         `id` BIGINT NOT NULL COMMENT '게시글 식별값',
+                         `id` BIGINT AUTO_INCREMENT NOT NULL COMMENT '게시글 식별값',
                          `title` VARCHAR(255) NOT NULL COMMENT '제목',
                          `content` VARCHAR(4000) NOT NULL COMMENT '내용',
 #                          `createdAt` DATETIME NOT NULL COMMENT '생성일',
@@ -89,7 +89,7 @@ CREATE TABLE `posts` (
 
 -- 4. comments
 CREATE TABLE `comments` (
-                            `id` BIGINT NOT NULL COMMENT '댓글 식별값',
+                            `id` BIGINT AUTO_INCREMENT NOT NULL COMMENT '댓글 식별값',
                             `content` LONGTEXT NOT NULL COMMENT '내용',
 #                             `createdAt` DATETIME NOT NULL COMMENT '생성일',
 #                             `updatedAt` DATETIME NOT NULL COMMENT '수정일',
@@ -104,7 +104,7 @@ CREATE TABLE `comments` (
 
 -- 5. replies
 CREATE TABLE `replies` (
-                           `id` BIGINT NOT NULL COMMENT '답글 식별값',
+                           `id` BIGINT AUTO_INCREMENT NOT NULL COMMENT '답글 식별값',
                            `content` LONGTEXT NOT NULL COMMENT '내용',
 #                            `createdAt` DATETIME NOT NULL COMMENT '생성일',
 #                            `updatedAt` DATETIME NOT NULL COMMENT '수정일',
@@ -119,7 +119,7 @@ CREATE TABLE `replies` (
 
 -- 6. notifications
 CREATE TABLE `notifications` (
-                                 `id` BIGINT NOT NULL COMMENT '알림 식별값',
+                                 `id` BIGINT AUTO_INCREMENT NOT NULL COMMENT '알림 식별값',
                                  `message` LONGTEXT NOT NULL COMMENT '내용',
                                  `state` BOOLEAN NOT NULL COMMENT '읽음 상태',
 #                                  `createdAt` DATETIME NOT NULL COMMENT '생성일',
@@ -130,7 +130,7 @@ CREATE TABLE `notifications` (
 
 -- 7. subscriptions
 CREATE TABLE `subscriptions` (
-                                 `id` BIGINT NOT NULL COMMENT '구독 식별값',
+                                 `id` BIGINT AUTO_INCREMENT NOT NULL COMMENT '구독 식별값',
 #                                  `createdAt` DATETIME NOT NULL COMMENT '생성일',
 #                                  `updatedAt` DATETIME NOT NULL COMMENT '수정일',
 #                                  `deletedAt` DATETIME COMMENT '삭제일',
@@ -145,7 +145,7 @@ CREATE TABLE `subscriptions` (
 
 -- 8. visitor
 CREATE TABLE `visitor` (
-                           `id` BIGINT NOT NULL COMMENT '식별값',
+                           `id` BIGINT AUTO_INCREMENT NOT NULL COMMENT '식별값',
 #                            `createdAt` DATETIME NOT NULL COMMENT '생성일',
                            `post_id` BIGINT NOT NULL COMMENT '게시글 식별값',
                            `user_id` VARCHAR(255) NOT NULL COMMENT '회원 식별 값',
@@ -157,7 +157,7 @@ CREATE TABLE `visitor` (
 
 -- 9. bookmarks
 CREATE TABLE `bookmarks` (
-                             `id` BIGINT NOT NULL COMMENT '즐겨찾기 식별값',
+                             `id` BIGINT AUTO_INCREMENT NOT NULL COMMENT '즐겨찾기 식별값',
                              `name` LONGTEXT NOT NULL COMMENT '이름',
 #                              `createdAt` DATETIME NOT NULL COMMENT '생성일',
 #                              `updatedAt` DATETIME NOT NULL COMMENT '수정일',
