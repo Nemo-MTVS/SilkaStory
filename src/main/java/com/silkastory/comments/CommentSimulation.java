@@ -1,0 +1,89 @@
+package com.silkastory.comments;
+
+import java.util.List;
+
+public class CommentSimulation {
+
+    private Long id;
+    private Long id2;
+
+    public void createComment() {
+        CommentsRepository commentsRepository = new CommentsRepositoryImpl();
+        System.out.println("유저식별값: userId, 게시글 식별값: 1L, 내용: 'content' 로 생성 시도");
+        Comments comment = new Comments(null, "content", 1L, "userId");
+        commentsRepository.save(comment);
+        id = comment.getId();
+        System.out.println("Comment :" + comment);
+    }
+
+    public void create2Comment() {
+        CommentsRepository commentsRepository = new CommentsRepositoryImpl();
+        System.out.println("유저식별값: userId, 게시글 식별값: 2L, 내용: 'content2' 로 생성 시도");
+        Comments comment = new Comments(null, "content2", 2L, "userId");
+        commentsRepository.save(comment);
+        id2 = comment.getId();
+        System.out.println("Comment :" + comment);
+    }
+
+    public void getComments() {
+        System.out.println("모든 댓글 조회 시도");
+        CommentsRepository commentsRepository = new CommentsRepositoryImpl();
+        List<Comments> comments = commentsRepository.findAll();
+        for (Comments comment : comments) {
+            System.out.println(comment);
+        }
+        System.out.println("모든 댓글 조회 종료");
+    }
+
+    public void getComment() {
+        System.out.println(id + "번 댓글 조회 시도");
+        CommentsRepository commentsRepository = new CommentsRepositoryImpl();
+        Comments comments = commentsRepository.findById(id);
+        if (comments == null){
+            System.out.println("1번 댓글이 없음");
+            return;
+        }
+        System.out.println(comments);
+    }
+
+    public void updateComment() {
+        CommentsRepository commentsRepository = new CommentsRepositoryImpl();
+        Comments comment = commentsRepository.findById(id);
+        System.out.println(id + "번 댓글의 내용을 'new content'로 수정 시도");
+        comment.updateContent("new content");
+        commentsRepository.save(comment);
+        System.out.println("Comment :" + comment);
+    }
+
+    public void deleteComment() {
+        System.out.println(id + " 댓글 삭제 시도");
+        CommentsRepository commentsRepository = new CommentsRepositoryImpl();
+        commentsRepository.deleteById(id);
+        Comments comments = commentsRepository.findById(id);
+        if (comments == null){
+            System.out.println(id + "번 댓글 삭제 완료");
+        }
+    }
+    public void deleteComment2() {
+        System.out.println(id2 + " 댓글 삭제 시도");
+        CommentsRepository commentsRepository = new CommentsRepositoryImpl();
+        commentsRepository.deleteById(id2);
+        Comments comments = commentsRepository.findById(id2);
+        if (comments == null){
+            System.out.println(id2 + "번 댓글 삭제 완료");
+        }
+    }
+
+    public static void main(String[] args) {
+        System.out.println("====Comment Simulation Start===");
+        CommentSimulation commentSimulation = new CommentSimulation();
+        commentSimulation.createComment();
+        commentSimulation.create2Comment();
+        commentSimulation.getComments();
+        commentSimulation.getComment();
+        commentSimulation.updateComment();
+        commentSimulation.deleteComment();
+        commentSimulation.deleteComment2();
+        System.out.println("====Comment Simulation END===");
+    }
+}
