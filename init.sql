@@ -6,9 +6,9 @@
 # ALTER TABLE `categories` DROP FOREIGN KEY `fk_categories_user_id__users_id`;
 # ALTER TABLE `categories` DROP FOREIGN KEY `fk_categories_target_category_id__categories_id`;
 #
-# -- comments
-# ALTER TABLE `comments` DROP FOREIGN KEY `fk_comments_post_id__posts_id`;
-# ALTER TABLE `comments` DROP FOREIGN KEY `fk_comments_user_id__users_id`;
+# -- comment
+# ALTER TABLE `comment` DROP FOREIGN KEY `fk_comments_post_id__posts_id`;
+# ALTER TABLE `comment` DROP FOREIGN KEY `fk_comments_user_id__users_id`;
 #
 # -- notifications
 # ALTER TABLE `notifications` DROP FOREIGN KEY `fk_notifications_user_id__users_id`;
@@ -34,7 +34,7 @@ DROP TABLE IF EXISTS `bookmarks`;
 DROP TABLE IF EXISTS `visitor`;
 DROP TABLE IF EXISTS `subscriptions`;
 DROP TABLE IF EXISTS `replies`;
-DROP TABLE IF EXISTS `comments`;
+DROP TABLE IF EXISTS `comment`;
 DROP TABLE IF EXISTS `notifications`;
 DROP TABLE IF EXISTS `posts`;
 DROP TABLE IF EXISTS `categories`;
@@ -87,8 +87,8 @@ CREATE TABLE `posts` (
 #                          CONSTRAINT `fk_posts_category_id__categories_id` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`)
 ) COMMENT = '게시글';
 
--- 4. comments
-CREATE TABLE `comments` (
+-- 4. comment
+CREATE TABLE `comment` (
                             `id` BIGINT AUTO_INCREMENT NOT NULL COMMENT '댓글 식별값',
                             `content` LONGTEXT NOT NULL COMMENT '내용',
 #                             `createdAt` DATETIME NOT NULL COMMENT '생성일',
@@ -113,7 +113,7 @@ CREATE TABLE `replies` (
                            `comment_id` BIGINT NOT NULL COMMENT '댓글 식별값',
                            `user_id` VARCHAR(255) NOT NULL COMMENT '회원 식별 값',
                            PRIMARY KEY (`id`)
-#                            CONSTRAINT `fk_replies_comment_id__comments_id` FOREIGN KEY (`comment_id`) REFERENCES `comments` (`id`),
+#                            CONSTRAINT `fk_replies_comment_id__comments_id` FOREIGN KEY (`comment_id`) REFERENCES `comment` (`id`),
 #                            CONSTRAINT `fk_replies_user_id__users_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 ) COMMENT = '답글';
 

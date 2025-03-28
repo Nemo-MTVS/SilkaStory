@@ -5,7 +5,7 @@ import com.silkastory.common.Id;
 import com.silkastory.common.Table;
 
 @Table(name = "comments")
-public class Comments {
+public class Comment {
     @Id
     private Long id;
 
@@ -18,9 +18,9 @@ public class Comments {
     @Column(name = "user_id")
     private String userId;
 
-    public Comments() {}
+    public Comment() {}
 
-    public Comments(Long id, String content, Long postId, String userId) {
+    public Comment(Long id, String content, Long postId, String userId) {
         this.id = id;
         this.content = content;
         this.postId = postId;
