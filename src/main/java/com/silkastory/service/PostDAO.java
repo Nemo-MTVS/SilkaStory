@@ -9,7 +9,7 @@ import java.sql.SQLException;
 public class PostDAO {
 
     public int createPost(Post postdata) throws SQLException {
-        String sql = "INSERT INTO posts(title, content, user_id, category_id) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO posts (title, content, user_id, category_id, is_public) VALUES (?, ?, ?, ?, ?)";
         //HikakiCP로 관리하는 DB 연결을 가져오는 부분
         try (Connection conn = JDBCConnection.getConnection();
              //SQL문을 실행할 pstmt 객체 생성
@@ -18,6 +18,7 @@ public class PostDAO {
             pstmt.setString(2, postdata.getContent());
             pstmt.setString(3, postdata.getId());
             pstmt.setInt(4, postdata.getCategoty_id());
+            pstmt.setBoolean(5, postdata.ispublic());
              return pstmt.executeUpdate(); // 삽입된 행의 개수 반환
             //데이터 변경 SQL 실행하여 데이터베이스의 새로운 게시글 저장
 //             int rows = pstmt.executeUpdate();

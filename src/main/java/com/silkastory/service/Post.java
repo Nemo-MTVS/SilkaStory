@@ -5,6 +5,7 @@ public class Post {
     String content;
     String id;
     int categoty_id;
+    boolean ispublic;
 
     public Post(String title, String content, String id, int categoty_id) {
         this.title = title;
@@ -28,6 +29,11 @@ public class Post {
     public int getCategoty_id() {
         return categoty_id;
     }
+
+    public boolean ispublic() {
+        return ispublic;
+    }
+
 
 
     @Override
