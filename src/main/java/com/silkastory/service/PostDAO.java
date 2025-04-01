@@ -1,12 +1,30 @@
 package com.silkastory.service;
 
 import com.silkastory.infrastructure.database.JDBCConnection;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class PostDAO {
+
+    // 게시글, 카테고리, 사용자 정보를 JOIN해서 가져오는 메서드
+    public Post getPostWithCategoryAndUser(Long postId) throws SQLException {
+        String sql = "SELECT p.id, p.title, p.content, p.is_public, c.name AS category_name, u.name " +
+                "FROM posts p " +
+                "JOIN categories c ON p.category_id = c.id " +
+                "JOIN users u ON p.user_id = u.id " +
+                "WHERE p.id = ?";
+
+        try(Connection conn = JDBCConnection.getConnection())
+        {
+
+        }
+
+        //
+    }
+
+
 
     public int createPost(Post postdata) throws SQLException {
         String sql = "INSERT INTO posts (title, content, user_id, category_id, is_public) VALUES (?, ?, ?, ?, ?)";

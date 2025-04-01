@@ -1,4 +1,4 @@
-package com.bookmarks;
+package com.silkastory.bookmarks;
 
 import com.silkastory.infrastructure.database.JDBCConnection;
 import java.sql.Connection;
