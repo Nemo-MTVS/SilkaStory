@@ -8,7 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.UUID;
 
-public class User {
+public class UserTmp {
 
     public static void main(String[] args) {
 
@@ -146,7 +146,7 @@ public class User {
         String checkUserSql = "DELETE FROM users WHERE id = ?";
 
         try (Connection conn = JDBCConnection.getConnection();
-             PreparedStatement checkStmt = conn.prepareStatement(checkUserSql);){
+             PreparedStatement checkStmt = conn.prepareStatement(checkUserSql)){
             //사용자 존재 여부 확인
             checkStmt.setString(1, id);
 
