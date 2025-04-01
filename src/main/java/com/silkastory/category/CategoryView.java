@@ -1,6 +1,6 @@
 package com.silkastory.category;
 
-import com.silkastory.View;
+import com.silkastory.common.View;
 import com.silkastory.common.RepositoryFactory;
 import com.silkastory.infrastructure.database.JDBCConnection;
 

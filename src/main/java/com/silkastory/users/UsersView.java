@@ -1,6 +1,6 @@
 package com.silkastory.users;
 
-import com.silkastory.View;
+import com.silkastory.common.View;
 
 import java.util.List;
 import java.util.Scanner;

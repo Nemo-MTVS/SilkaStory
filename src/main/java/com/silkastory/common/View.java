@@ -1,4 +1,4 @@
-package com.silkastory;
+package com.silkastory.common;
 
 /**
  * 도메인별 시뮬레이터에 대한 View 인터페이스

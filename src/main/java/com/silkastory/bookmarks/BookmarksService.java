@@ -5,6 +5,7 @@ package com.silkastory.bookmarks;
 
  */
 
+import java.sql.SQLException;
 import java.util.List;
 
 public class BookmarksService {
@@ -14,16 +15,30 @@ public class BookmarksService {
         this.bookmarksDAO = bookmarksDAO;
     }
 
-    public void saveBookmarks(String userId,int postId,long name) {
+    // 즐겨찾기 추가
+    public void saveBookmarks(String userId,int postId,String name) throws SQLException {
         //Bookmarks에 UserId,name,PostId가 있나 확인
-        if(!BookmarksDAO.getAllBookmarks(userId).contains(postId)){
+        if(!bookmarksDAO.existBookmark(userId, postId)){
             //이미 즐겨찾기 목록에 없으면 즐겨찾기 추가
-            BookmarksDAO.addBookmark("아이디", 1212, 100L);
+            bookmarksDAO.addBookmark(userId, postId, name);
         }
     }
 
-    public List<Bookmarks> getAllBookmarks() {
-        return null;
+    // 즐겨찾기 수정
+    public void updateBookmarks(String userId,int postId,String name) throws SQLException {
+        //즐겨찾기 목록에 있으면 즐겨찾기 수정
+        bookmarksDAO.updateBookmark(userId, postId, name);
     }
 
+    // 즐겨찾기 삭제
+    public void deleteBookmarks(String userId,int postId) throws SQLException {
+        //즐겨찾기 목록에 있으면 즐겨찾기 삭제
+        bookmarksDAO.removeBookmark(userId, postId);
+    }
+
+    // 즐겨찾기 목록 가져오기
+    public List<BookmarksDTO> getBookmarks(String userId, int postId) throws SQLException {
+        //즐겨찾기 목록에 있으면 즐겨찾기 가져오기
+        return bookmarksDAO.getAllBookmarks(userId);
+    }
 }

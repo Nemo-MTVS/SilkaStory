@@ -1,4 +1,4 @@
-package com.silkastory.service;
+package com.silkastory.post;
 
 import com.silkastory.infrastructure.database.JDBCConnection;
 import java.sql.Connection;
@@ -9,19 +9,36 @@ import java.sql.SQLException;
 public class PostDAO {
 
     // 게시글, 카테고리, 사용자 정보를 JOIN해서 가져오는 메서드
-    public Post getPostWithCategoryAndUser(Long postId) throws SQLException {
-        String sql = "SELECT p.id, p.title, p.content, p.is_public, c.name AS category_name, u.name " +
-                "FROM posts p " +
-                "JOIN categories c ON p.category_id = c.id " +
-                "JOIN users u ON p.user_id = u.id " +
-                "WHERE p.id = ?";
+    public PostResponseDTO getPostWithCategoryAndUser(Long postId) throws SQLException {
+        String sql = """
+                    SELECT
+                    p.id, p.title, p.content, c.name AS category_name, u.nickname
+                    FROM posts p
+                    JOIN categories c ON p.category_id = c.id
+                    JOIN users u ON p.user_id = u.id
+                    WHERE p.id = ?
+                """;
+        try(Connection conn = JDBCConnection.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setLong(1, postId);
+            ResultSet rs = pstmt.executeQuery();
 
-        try(Connection conn = JDBCConnection.getConnection())
-        {
-
+            if (rs.next()) {
+                return new PostResponseDTO(
+                        rs.getString("id"),
+                        rs.getString("title"),
+                        rs.getString("content"),
+                        rs.getString("category_name"),
+                        rs.getString("nickname")
+                );
+            } else {
+                return null; // 게시글이 존재하지 않는 경우
+            }
+        } catch (SQLException e) {
+            System.err.println("게시글 조회 중 오류 발생: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
         }
-
-        //
     }
 
 
@@ -35,7 +52,7 @@ public class PostDAO {
             pstmt.setString(1, postdata.getTitle());
             pstmt.setString(2, postdata.getContent());
             pstmt.setString(3, postdata.getId());
-            pstmt.setInt(4, postdata.getCategoty_id());
+            pstmt.setInt(4, postdata.getCategoryId());
             pstmt.setBoolean(5, postdata.ispublic());
              return pstmt.executeUpdate(); // 삽입된 행의 개수 반환
             //데이터 변경 SQL 실행하여 데이터베이스의 새로운 게시글 저장
@@ -57,7 +74,7 @@ public class PostDAO {
             pstmt.setString(1, postdata.getTitle());
             pstmt.setString(2, postdata.getContent());
             pstmt.setString(3, postdata.getId());
-            pstmt.setInt(4, postdata.getCategoty_id());
+            pstmt.setInt(4, postdata.getCategoryId());
             return pstmt.executeUpdate();  // 수정된 행의 개수 반환
         } catch (SQLException e) {
             System.err.println("게시글 수정 중 오류 발생: " + e.getMessage());

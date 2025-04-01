@@ -1,17 +1,17 @@
-package com.silkastory.service;
+package com.silkastory.post;
 
 public class Post {
     String title;
     String content;
     String id;
-    int categoty_id;
-    boolean ispublic;
+    int categoryId;
+    boolean isPublic;
 
-    public Post(String title, String content, String id, int categoty_id) {
+    public Post(String title, String content, String id, int categoryId) {
         this.title = title;
         this.content = content;
         this.id = id;
-        this.categoty_id = categoty_id;
+        this.categoryId = categoryId;
     }
 
     public String getTitle() {
@@ -26,15 +26,13 @@ public class Post {
         return id;
     }
 
-    public int getCategoty_id() {
-        return categoty_id;
+    public int getCategoryId() {
+        return categoryId;
     }
 
     public boolean ispublic() {
-        return ispublic;
+        return isPublic;
     }
-
-
 
     @Override
     public String toString() {
@@ -42,7 +40,7 @@ public class Post {
                 "title='" + title + '\'' +
                 ", content='" + content + '\'' +
                 ", id='" + id + '\'' +
-                ", category_id='" + categoty_id + '\'' +  // category_id 추가
+                ", category_id='" + categoryId + '\'' +  // category_id 추가
                 '}';
     }
 }

@@ -1,4 +1,4 @@
-package com.silkastory.service;
+package com.silkastory.post;
 
 public class PostView {
     private PostService postService = new PostService();

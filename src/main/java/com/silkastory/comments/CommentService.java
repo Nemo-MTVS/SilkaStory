@@ -1,4 +1,4 @@
-package com.silkastory.Comments;
+package com.silkastory.comments;
 import java.util.List;
 
 public class CommentService {

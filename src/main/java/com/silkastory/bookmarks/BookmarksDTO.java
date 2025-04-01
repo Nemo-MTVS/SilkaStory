@@ -1,37 +1,40 @@
 package com.silkastory.bookmarks;
 
-public class Bookmarks {
+public class BookmarksDTO {
     private Long id;
-    public String userId;
-    public int postId;
-    public String name;
+    private String userId;
+    private int postId;
+    private String nickname;
 
-    public Bookmarks(String userId,int postId,String name){
+
+    public BookmarksDTO(Long id, String userId, int postId, String nickname) {
+        this.id = id;
         this.userId = userId;
         this.postId = postId;
-        this.name = name;
-    }
-
-    public Long getId() {
-        return id;
+        this.nickname = nickname;
     }
 
     public String getUserId() {
         return userId;
     }
+
     public void setUserId(String userId) {
         this.userId = userId;
     }
+
     public int getPostId() {
         return postId;
     }
+
     public void setPostId(int postId) {
         this.postId = postId;
     }
-    public String getName() {
-        return name;
+
+    public String getNickname() {
+        return nickname;
     }
-    public void setName(String name) {
-        this.name = name;
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 }

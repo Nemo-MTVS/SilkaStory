@@ -1,4 +1,4 @@
-package com.silkastory;
+package com.silkastory.common;
 
 import com.silkastory.category.CategoryView;
 import com.silkastory.notifications.NotificationsView;

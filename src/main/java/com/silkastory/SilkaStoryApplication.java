@@ -1,5 +1,8 @@
 package com.silkastory;
 
+import com.silkastory.common.View;
+import com.silkastory.common.ViewFactory;
+
 import java.util.Scanner;
 
 /**

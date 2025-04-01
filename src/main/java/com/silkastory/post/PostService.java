@@ -1,4 +1,4 @@
-package com.silkastory.service;
+package com.silkastory.post;
 
 import java.sql.SQLException;
 

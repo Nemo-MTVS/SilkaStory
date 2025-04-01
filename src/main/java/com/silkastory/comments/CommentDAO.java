@@ -1,4 +1,4 @@
-package com.silkastory.Comments;
+package com.silkastory.comments;
 
 import com.silkastory.infrastructure.database.JDBCConnection;
 

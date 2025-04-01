@@ -1,4 +1,4 @@
-package com.silkastory.Comments;
+package com.silkastory.comments;
 
 public class Comment {
     private Long id;

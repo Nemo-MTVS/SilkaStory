@@ -20,57 +20,106 @@ public class BookmarksDAO{
         this.connection = connection;
     }
 
-    public static void addBookmark(String username, int postId, Long name) {
-        String sql = "INSERT INTO Bookmarks (user_id, post_id, name) VALUES (?, ?, ?)";
+    public void addBookmark(String userId, int postId, String name) throws SQLException {
+        String sql = "INSERT INTO bookmarks (user_id, post_id, name) VALUES (?, ?, ?)";
         PreparedStatement preparedStatement = null;
         //conn은 Connection 객체입니다. SQL 쿼리 sql을 준비하고, 그 결과로 PreparedStatement 객체를 생성합니다.
         try(Connection conn = JDBCConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql)){
-            pstmt.setString(1, username);
+            pstmt.setString(1, userId);
             pstmt.setInt(2, postId);
-            pstmt.setLong(3, name);
+            pstmt.setString(3, name);
             pstmt.executeUpdate();
-        }catch(SQLException e)
-        {
+        }catch(SQLException e){
             e.printStackTrace();
+            throw  e;
+        }
+    }
+
+    // 수정 이름만 userId, postId, name을 받는다
+    public void updateBookmark(String userId, int postId, String name) throws SQLException {
+        String sql = "UPDATE bookmarks SET name = ? WHERE user_id = ? AND post_id = ?";
+        PreparedStatement preparedStatement = null;
+        try(Connection conn = JDBCConnection.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql)){
+            pstmt.setString(1, name);
+            pstmt.setString(2, userId);
+            pstmt.setInt(3, postId);
+            pstmt.executeUpdate();
+        }catch(SQLException e){
+            e.printStackTrace();
+            throw e;
         }
     }
 
     //삭제
-    public void removeBookmark(Bookmarks bookmarks) {
-        String sql = "DELETE FROM Bookmarks WHERE user_id = ? AND post_id = ?";
+    public void removeBookmark(String userId, int postId) throws SQLException {
+        String sql = "DELETE FROM bookmarks WHERE user_id = ? AND post_id = ?";
         PreparedStatement preparedStatement = null;
         try(Connection conn = JDBCConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql)){
-            pstmt.setString(1, bookmarks.getUserId());
-            pstmt.setInt(2, bookmarks.getPostId());
-            pstmt.setLong(3, bookmarks.getName());
+            pstmt.setString(1, userId);
+            pstmt.setInt(2, postId);
             pstmt.executeUpdate();
-        }catch(SQLException e)
-        {
+        }catch(SQLException e){
             e.printStackTrace();
+            throw e;
         }
+    }
 
-        }
-        //조회
-        public static List<Long> getAllBookmarks(String userId) {
-            // 즐겨찾기 테이블에서 user_id에 해당하는 post_id를 조회하는 SQL 쿼리
-            String sql = "SELECT * FROM Bookmarks WHERE user_id = ?";
-            List<Long> bookmarks = new ArrayList<>(); // 결과로 반환할 게시글 ID 리스트
-
-            try(Connection conn = JDBCConnection.getConnection();// JDBC 연결을 가져옵니다.
-                PreparedStatement pstmt = conn.prepareStatement(sql)){// SQL문을 준비합니다.
-                pstmt.setString(1, userId); // ?에 userId 값을 설정합니다.
-                ResultSet rs = pstmt.executeQuery();// 쿼리를 실행하여 결과를 얻습니다.
-
-                while(rs.next()){// 결과가 있을 때마다 반복
-                    bookmarks.add(rs.getLong("post_id")); // 결과에서 post_id 값을 리스트에 추가
+    public boolean existBookmark(String userId, int postId) throws SQLException {
+        String sql = """
+                SELECT EXISTS (
+                  SELECT 1 FROM bookmarks WHERE user_id = ? AND post_id = ?
+                ) AS is_bookmarked;
+                """;
+        try (Connection conn = JDBCConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setString(1, userId);
+                pstmt.setInt(2, postId);
+                ResultSet rs = pstmt.executeQuery();
+                if (rs.next()) {
+                    return rs.getBoolean("is_bookmarked");
                 }
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
+                throw e;
             }
-            return bookmarks;
+        return false;
+    }
+
+    public List<BookmarksDTO> getAllBookmarks(String userId) {
+        // 즐겨찾기 테이블에서 모든 데이터를 조회하는 SQL 쿼리
+        String sql = """
+                    SELECT
+                        b.id as bookmark_id,
+                        b.user_id,
+                        b.post_id,
+                        u.nickname
+                        FROM bookmarks b
+                    join SilkaStory.users u on u.id = b.user_id
+                    where u.id = ?
+                """;
+
+        List<BookmarksDTO> bookmarksList = new ArrayList<>(); // 결과로 반환할 즐겨찾기 리스트
+
+        try(Connection conn = JDBCConnection.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql)){
+            pstmt.setString(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+
+            while(rs.next()){
+                BookmarksDTO bookmarks = new BookmarksDTO(
+                        rs.getLong("bookmark_id"),
+                        rs.getString("user_id"),
+                        rs.getInt("post_id"),
+                        rs.getString("name")
+                );
+                bookmarksList.add(bookmarks); // 결과에서 각 즐겨찾기를 리스트에 추가
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-
-
+        return bookmarksList;
+    }
 }
