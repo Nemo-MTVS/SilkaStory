@@ -64,10 +64,10 @@ CREATE TABLE `categories` (
 #                               `deletedAt` DATETIME COMMENT '삭제일',
 #                               `isUsed` BOOLEAN NOT NULL COMMENT '삭제상태',
                               `user_id` VARCHAR(255) NOT NULL COMMENT '회원 식별 값',
-                              `target_category_id` BIGINT NOT NULL COMMENT '참조 카테고리 식별값',
+                              `target_category_id` BIGINT NULL COMMENT '참조 카테고리 식별값',
                               PRIMARY KEY (`id`)
-#                               CONSTRAINT `fk_categories_user_id__users_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
-#                               CONSTRAINT `fk_categories_target_category_id__categories_id` FOREIGN KEY (`target_category_id`) REFERENCES `categories` (`id`)
+#                               , CONSTRAINT `fk_categories_user_id__users_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+#                               , CONSTRAINT `fk_categories_target_category_id__categories_id` FOREIGN KEY (`target_category_id`) REFERENCES `categories` (`id`)
 ) COMMENT = '카테고리';
 
 -- 3. posts
@@ -146,7 +146,7 @@ CREATE TABLE `subscriptions` (
 -- 8. visitor
 CREATE TABLE `visitor` (
                            `id` BIGINT AUTO_INCREMENT NOT NULL COMMENT '식별값',
-#                            `createdAt` DATETIME NOT NULL COMMENT '생성일',
+                           `visitDate` DATETIME NOT NULL COMMENT '방문일',
                            `post_id` BIGINT NOT NULL COMMENT '게시글 식별값',
                            `user_id` VARCHAR(255) NOT NULL COMMENT '회원 식별 값',
                            PRIMARY KEY (`id`)
