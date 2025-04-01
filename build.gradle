@@ -11,15 +11,17 @@ repositories {
 }
 
 dependencies {
-    // https://mvnrepository.com/artifact/com.zaxxer/HikariCP
+    // 기존 의존성
     implementation group: 'com.zaxxer', name: 'HikariCP', version: '4.0.3'
-    // https://mvnrepository.com/artifact/com.mysql/mysql-connector-j
     implementation group: 'com.mysql', name: 'mysql-connector-j', version: '8.3.0'
-
-    // https://mvnrepository.com/artifact/ch.qos.logback/logback-classic
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.16'
+    
+    // Hibernate JPA
+    implementation group: 'org.hibernate', name: 'hibernate-core', version: '6.4.4.Final'
+    implementation group: 'org.hibernate', name: 'hibernate-hikaricp', version: '6.4.4.Final'
+    implementation group: 'jakarta.persistence', name: 'jakarta.persistence-api', version: '3.1.0'
 
-
+    // 테스트 의존성
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
 }
@@ -30,8 +32,8 @@ jacoco {
 
 test {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport // 테스트 후 자동으로 JaCoCo 보고서 생성
 }
-
 
 jacocoTestReport {
     dependsOn test
