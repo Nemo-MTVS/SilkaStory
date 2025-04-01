@@ -1,4 +1,4 @@
-package com.bookmarks;
+package com.silkastory.bookmarks;
 
 public class Bookmarks {
     public String userId;

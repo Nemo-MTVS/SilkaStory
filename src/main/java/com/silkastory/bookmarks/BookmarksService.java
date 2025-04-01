@@ -1,4 +1,4 @@
-package com.bookmarks;
+package com.silkastory.bookmarks;
 /*
 비즈니스 로직 관리 (예외 처리 등)
 게시글 추가, 생성,수정 기능 담당
