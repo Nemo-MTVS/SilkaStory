@@ -21,7 +21,6 @@ dependencies {
     implementation group: 'org.hibernate', name: 'hibernate-hikaricp', version: '6.4.4.Final'
     implementation group: 'jakarta.persistence', name: 'jakarta.persistence-api', version: '3.1.0'
 
-    // 테스트 의존성
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
 }
