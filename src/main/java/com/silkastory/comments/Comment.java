@@ -1,26 +1,34 @@
 package com.silkastory.comments;
 
+/**
+ * 댓글 모델 클래스
+ */
 public class Comment {
     private Long id;
     private String content;
-    private String createdAt;
-    private String updatedAt;
-    private String deletedAt;
-    private boolean isDeleted;
     private Long postId;
     private String userId;
 
-    public Comment(Long id, String content, String createdAt, String updatedAt, String deletedAt, boolean isDeleted, Long postId, String userId) {
-        this.id = id;
+    // 기본 생성자
+    public Comment() {
+    }
+
+    // 새 댓글 생성용 생성자
+    public Comment(String content, Long postId, String userId) {
         this.content = content;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.deletedAt = deletedAt;
-        this.isDeleted = isDeleted;
         this.postId = postId;
         this.userId = userId;
     }
 
+    // 전체 필드 생성자
+    public Comment(Long id, String content, Long postId, String userId) {
+        this.id = id;
+        this.content = content;
+        this.postId = postId;
+        this.userId = userId;
+    }
+
+    // Getter와 Setter 메서드
     public Long getId() {
         return id;
     }
@@ -37,38 +45,6 @@ public class Comment {
         this.content = content;
     }
 
-    public String getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public String getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(String updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public String getDeletedAt() {
-        return deletedAt;
-    }
-
-    public void setDeletedAt(String deletedAt) {
-        this.deletedAt = deletedAt;
-    }
-
-    public boolean isDeleted() {
-        return isDeleted;
-    }
-
-    public void setDeleted(boolean deleted) {
-        isDeleted = deleted;
-    }
-
     public Long getPostId() {
         return postId;
     }
@@ -83,5 +59,15 @@ public class Comment {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    @Override
+    public String toString() {
+        return "Comment{" +
+                "id=" + id +
+                ", content='" + content + '\'' +
+                ", postId=" + postId +
+                ", userId='" + userId + '\'' +
+                '}';
     }
 }

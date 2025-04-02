@@ -9,15 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BookmarksDAO{
-    //생성자
-    //의존성 주입
-    //BookmarksDAO는 JDBCConnection에 의존하고 있습니다. 이 생성자를 통해 FavoriteDAO가 초기화될 때
-    // JDBCConnection 객체를 주입받습니다.
-    // 이는 의존성 주입(Dependency Injection) 패턴의 일종입니다.
-    private final JDBCConnection connection;
 
-    public BookmarksDAO(JDBCConnection connection) {
-        this.connection = connection;
+    public BookmarksDAO() {
     }
 
     public void addBookmark(String userId, int postId, String name) throws SQLException {
@@ -95,6 +88,7 @@ public class BookmarksDAO{
                         b.id as bookmark_id,
                         b.user_id,
                         b.post_id,
+                        b.name,
                         u.nickname
                         FROM bookmarks b
                     join SilkaStory.users u on u.id = b.user_id
@@ -113,6 +107,7 @@ public class BookmarksDAO{
                         rs.getLong("bookmark_id"),
                         rs.getString("user_id"),
                         rs.getInt("post_id"),
+                        rs.getString("nickname"),
                         rs.getString("name")
                 );
                 bookmarksList.add(bookmarks); // 결과에서 각 즐겨찾기를 리스트에 추가

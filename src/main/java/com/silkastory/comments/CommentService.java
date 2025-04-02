@@ -1,48 +1,117 @@
 package com.silkastory.comments;
+
+import com.silkastory.post.PostDAO;
+
+import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * 댓글 서비스 클래스 - 비즈니스 로직 처리
+ */
 public class CommentService {
+    
     private final CommentDAO commentDAO;
-    //CommentDAO를 주입 받아서 데이터베이스 연산을 수행
-    //List를 사용해 여러 개의 댓글을 관리
-
-    public CommentService(CommentDAO commentDAO) {
+    private final PostDAO postDAO;
+    
+    public CommentService(CommentDAO commentDAO, PostDAO postDAO) {
         this.commentDAO = commentDAO;
+        this.postDAO = postDAO;
     }
-    //DAO를 서비스 계층에서 감싸는 역할
-    //다른 계층에서 CommentService를 사용하면 직접 DAO를 호출하지 않아도 된다. 비즈니스 로직과 DB 처리를 분리하여 유지보수성 높임
-
-    // 댓글 작성
-    public void addComment(String content, Long postId, String userId) {
+    
+    /**
+     * 새 댓글 생성
+     */
+    public boolean addComment(String content, Long postId, String userId) throws SQLException {
+        // 유효성 검사
+        if (content == null || content.trim().isEmpty()) {
+            throw new IllegalArgumentException("댓글 내용은 비어있을 수 없습니다.");
+        }
+        
+        if (postId == null || postId <= 0) {
+            throw new IllegalArgumentException("유효하지 않은 게시글 ID입니다.");
+        }
+        
+        // 게시글 존재 여부 확인
+        if (postDAO.getPostById(postId.intValue()) == null) {
+            throw new IllegalArgumentException("존재하지 않는 게시글입니다.");
+        }
+        
         commentDAO.insertComment(content, postId, userId);
+        return true;
     }
-    //CommentDAO.insertComment()를 호출한다.
-    //DB에 새로운 댓글 추가
-
-    // 특정 게시글의 댓글 조회
-    public List<Comment> getComments(Long postId) {
+    
+    /**
+     * 특정 게시글의 모든 댓글 조회
+     */
+    public List<Comment> getCommentsByPost(Long postId) throws SQLException {
+        if (postId == null || postId <= 0) {
+            throw new IllegalArgumentException("유효하지 않은 게시글 ID입니다.");
+        }
+        
         return commentDAO.getCommentsByPost(postId);
     }
-    //postId를 이용해 CommentDAO.getCommentsByPost(postId) 호출
-    //DB에서 해당 게시글의 댓글 목록을 가져옴
-    //가져온 데이터를 List<Comment>형태로 변환한다.
-
-    //CommentDAO.deleteComment(commentId) 호출.
-    //DB에서 해당 댓글의 is_deleted 값을 TRUE로 변경.
-    //실제 데이터를 삭제하는 것이 아니라 삭제된 것처럼 처리.
-
-    //전체 흐름 정리
-    /*
-    서비스 계층(CommentService)에서 DAO를 감싸서 사용.
-
-DB 관련 로직을 DAO가 처리하고, Service는 이를 호출만 함.
-
-이점: 코드가 더 모듈화되고 유지보수가 쉬워짐.
-
-비즈니스 로직을 추가할 경우, CommentService에서 처리 가능.
-
-DAO 직접 호출을 방지하여, 계층 간 역할을 분리
-비즈니스 로직을 서비스 계층에서 관리
-JDBC와 HikariCP를 효율적으로 활용 가능
+    
+    /**
+     * 특정 댓글 조회
      */
+    public Comment getCommentById(Long commentId) throws SQLException {
+        if (commentId == null || commentId <= 0) {
+            throw new IllegalArgumentException("유효하지 않은 댓글 ID입니다.");
+        }
+        
+        return commentDAO.getCommentById(commentId);
+    }
+    
+    /**
+     * 댓글 삭제
+     */
+    public boolean deleteComment(Long commentId, String userId) throws SQLException {
+        Comment comment = commentDAO.getCommentById(commentId);
+        
+        if (comment == null) {
+            throw new IllegalArgumentException("존재하지 않는 댓글입니다.");
+        }
+        
+        // 작성자만 삭제 가능
+        if (!comment.getUserId().equals(userId)) {
+            throw new IllegalArgumentException("자신의 댓글만 삭제할 수 있습니다.");
+        }
+        
+        commentDAO.deleteComment(commentId);
+        return true;
+    }
+    
+    /**
+     * 댓글 수정
+     */
+    public boolean updateComment(Long commentId, String content, String userId) throws SQLException {
+        if (content == null || content.trim().isEmpty()) {
+            throw new IllegalArgumentException("댓글 내용은 비어있을 수 없습니다.");
+        }
+        
+        Comment comment = commentDAO.getCommentById(commentId);
+        
+        if (comment == null) {
+            throw new IllegalArgumentException("존재하지 않는 댓글입니다.");
+        }
+        
+        // 작성자만 수정 가능
+        if (!comment.getUserId().equals(userId)) {
+            throw new IllegalArgumentException("자신의 댓글만 수정할 수 있습니다.");
+        }
+        
+        commentDAO.updateComment(commentId, content);
+        return true;
+    }
+    
+    /**
+     * 특정 사용자의 모든 댓글 조회
+     */
+    public List<Comment> getCommentsByUser(String userId) throws SQLException {
+        if (userId == null || userId.trim().isEmpty()) {
+            throw new IllegalArgumentException("유효하지 않은 사용자 ID입니다.");
+        }
+        
+        return commentDAO.getCommentsByUser(userId);
+    }
 }

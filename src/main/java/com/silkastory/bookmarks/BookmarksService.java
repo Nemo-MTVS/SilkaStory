@@ -41,4 +41,9 @@ public class BookmarksService {
         //즐겨찾기 목록에 있으면 즐겨찾기 가져오기
         return bookmarksDAO.getAllBookmarks(userId);
     }
+    
+    // 즐겨찾기 여부 확인
+    public boolean isBookmarked(String userId, int postId) throws SQLException {
+        return bookmarksDAO.existBookmark(userId, postId);
+    }
 }

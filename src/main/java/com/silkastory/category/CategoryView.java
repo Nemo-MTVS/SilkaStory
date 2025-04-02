@@ -1,258 +1,277 @@
 package com.silkastory.category;
 
-import com.silkastory.common.View;
-import com.silkastory.common.RepositoryFactory;
-import com.silkastory.infrastructure.database.JDBCConnection;
-
 import java.util.List;
 import java.util.Scanner;
 
-public class CategoryView implements View {
-    private static final Scanner scanner = new Scanner(System.in);
-    private static final CategoryRepository categoryRepository = RepositoryFactory.getRepository(CategoryRepository.class);
-    private static final CategoryService categoryService = new CategoryService(categoryRepository);
-    private static final String TEST_USER_ID = "test_user";
-    
-    private boolean running = false;
-    
-    @Override
-    public void start() {
-        running = true;
-        System.out.println("카테고리 시뮬레이터를 시작합니다.");
+/**
+ * 카테고리 기능에 대한 View 클래스
+ * 사용자와 직접 상호작용하여 입력을 받고 결과를 출력
+ */
+public class CategoryView {
+    private final CategoryService categoryService;
+    private final Scanner scanner;
+
+    public CategoryView() {
+        CategoryRepository categoryRepository = new CategoryRepositoryImpl();
+        this.categoryService = new CategoryService(categoryRepository);
+        this.scanner = new Scanner(System.in);
+    }
+
+    /**
+     * 카테고리 메인 메뉴 실행
+     * 
+     * @param userId 현재 로그인한 사용자 ID
+     */
+    public void showMenu(String userId) {
+        boolean running = true;
         
         while (running) {
-            printMenu();
-            int choice = getIntInput("메뉴를 선택하세요: ");
+            System.out.println("\n===== 카테고리 관리 =====");
+            System.out.println("1. 카테고리 트리 보기");
+            System.out.println("2. 최상위 카테고리 목록 보기");
+            System.out.println("3. 하위 카테고리 목록 보기");
+            System.out.println("4. 카테고리 추가하기");
+            System.out.println("5. 카테고리 수정하기");
+            System.out.println("6. 카테고리 삭제하기");
+            System.out.println("0. 돌아가기");
+            System.out.print("메뉴 선택: ");
             
-            try {
-                switch (choice) {
-                    case 1:
-                        createCategory();
-                        break;
-                    case 2:
-                        findCategoryById();
-                        break;
-                    case 3:
-                        findCategoriesByParent();
-                        break;
-                    case 4:
-                        findRootCategories();
-                        break;
-                    case 5:
-                        updateCategory();
-                        break;
-                    case 6:
-                        deleteCategory();
-                        break;
-                    case 7:
-                        listAllCategories();
-                        break;
-                    case 0:
-                        stop();
-                        break;
-                    default:
-                        System.out.println("잘못된 메뉴 선택입니다. 다시 선택해주세요.");
-                }
-            } catch (Exception e) {
-                System.out.println("오류 발생: " + e.getMessage());
+            int choice = readInt();
+            
+            switch (choice) {
+                case 1:
+                    showCategoryTree(userId);
+                    break;
+                case 2:
+                    showRootCategories(userId);
+                    break;
+                case 3:
+                    showChildCategories();
+                    break;
+                case 4:
+                    addCategory(userId);
+                    break;
+                case 5:
+                    updateCategory(userId);
+                    break;
+                case 6:
+                    deleteCategory(userId);
+                    break;
+                case 0:
+                    running = false;
+                    break;
+                default:
+                    System.out.println("잘못된 선택입니다. 다시 시도해주세요.");
+            }
+        }
+    }
+
+    /**
+     * 카테고리 트리 구조 출력
+     */
+    private void showCategoryTree(String userId) {
+        System.out.println("\n===== 카테고리 트리 =====");
+        try {
+            List<CategoryDTO> categoryTree = categoryService.getCategoryTree(userId);
+            
+            if (categoryTree.isEmpty()) {
+                System.out.println("카테고리가 없습니다.");
+                return;
             }
             
-            System.out.println();
+            printCategoryTree(categoryTree, 0);
+            
+        } catch (Exception e) {
+            System.out.println("카테고리 트리를 가져오는 중 오류가 발생했습니다: " + e.getMessage());
         }
     }
     
-    @Override
-    public void stop() {
-        running = false;
-        System.out.println("카테고리 시뮬레이터를 종료합니다.");
-        JDBCConnection.close();
-    }
-    
-    @Override
-    public String getName() {
-        return "카테고리 시뮬레이터";
-    }
-    
-    private void printMenu() {
-        System.out.println("\n=== 카테고리 시뮬레이터 메뉴 ===");
-        System.out.println("1. 카테고리 생성");
-        System.out.println("2. 카테고리 ID로 조회");
-        System.out.println("3. 상위 카테고리 기준 하위 카테고리 조회");
-        System.out.println("4. 최상위 카테고리 조회");
-        System.out.println("5. 카테고리 수정");
-        System.out.println("6. 카테고리 삭제");
-        System.out.println("7. 모든 카테고리 목록 조회");
-        System.out.println("0. 종료");
-    }
-    
-    private void createCategory() {
-        System.out.println("\n=== 카테고리 생성 ===");
-        String name = getStringInput("카테고리 이름을 입력하세요: ");
+    /**
+     * 카테고리 트리 재귀적 출력
+     */
+    private void printCategoryTree(List<CategoryDTO> categories, int level) {
+        String indent = "  ".repeat(level);
         
-        System.out.println("상위 카테고리를 설정하시겠습니까? (Y/N)");
-        boolean hasParent = scanner.nextLine().trim().equalsIgnoreCase("Y");
+        for (CategoryDTO category : categories) {
+            System.out.println(indent + "ㄴ " + category.getName() + " (ID: " + category.getId() + ")");
+            printCategoryTree(category.getChildren(), level + 1);
+        }
+    }
+
+    /**
+     * 최상위 카테고리 목록 출력
+     */
+    private void showRootCategories(String userId) {
+        System.out.println("\n===== 최상위 카테고리 목록 =====");
+        List<Category> rootCategories = categoryService.findByRootCategory(userId);
         
-        Long parentId = null;
+        if (rootCategories.isEmpty()) {
+            System.out.println("최상위 카테고리가 없습니다.");
+            return;
+        }
         
-        if (hasParent) {
-            parentId = getLongInput("상위 카테고리 ID를 입력하세요: ");
+        System.out.println("ID\t깊이\t이름");
+        for (Category category : rootCategories) {
+            System.out.printf("%d\t%d\t%s\n", 
+                category.getId(),
+                category.getDepth(),
+                category.getName());
+        }
+    }
+
+    /**
+     * 하위 카테고리 목록 출력
+     */
+    private void showChildCategories() {
+        System.out.println("\n===== 하위 카테고리 목록 =====");
+        System.out.print("상위 카테고리 ID: ");
+        Long parentId = readLong();
+        
+        try {
+            // 상위 카테고리 정보 출력
             try {
                 Category parentCategory = categoryService.findById(parentId);
-                System.out.println("상위 카테고리: " + parentCategory.getName() + ", 깊이: " + parentCategory.getDepth());
-            } catch (Exception e) {
-                System.out.println("상위 카테고리를 찾을 수 없습니다. 루트 카테고리로 생성합니다.");
-                parentId = null;
+                System.out.println("상위 카테고리: " + parentCategory.getName() + " (ID: " + parentCategory.getId() + ")");
+            } catch (IllegalArgumentException e) {
+                System.out.println("해당 ID의 카테고리가 존재하지 않습니다.");
+                return;
             }
-        }
-        
-        try {
-            Category newCategory = categoryService.create(name, TEST_USER_ID, parentId);
-            System.out.println("카테고리가 성공적으로 생성되었습니다.");
-            printCategory(newCategory);
-        } catch (Exception e) {
-            System.out.println("카테고리 생성 실패: " + e.getMessage());
-        }
-    }
-    
-    private void findCategoryById() {
-        System.out.println("\n=== 카테고리 ID로 조회 ===");
-        Long id = getLongInput("조회할 카테고리 ID를 입력하세요: ");
-        
-        try {
-            Category category = categoryService.findById(id);
-            System.out.println("카테고리를 찾았습니다:");
-            printCategory(category);
-        } catch (Exception e) {
-            System.out.println("카테고리 조회 실패: " + e.getMessage());
-        }
-    }
-    
-    private void findCategoriesByParent() {
-        System.out.println("\n=== 상위 카테고리 기준 하위 카테고리 조회 ===");
-        Long parentId = getLongInput("상위 카테고리 ID를 입력하세요: ");
-        
-        try {
-            List<Category> categories = categoryService.findByParent(parentId);
-            System.out.println("하위 카테고리 " + categories.size() + "개를 찾았습니다:");
             
-            for (Category category : categories) {
-                printCategory(category);
+            List<Category> childCategories = categoryService.findByChild(parentId);
+            
+            if (childCategories.isEmpty()) {
+                System.out.println("하위 카테고리가 없습니다.");
+                return;
+            }
+            
+            System.out.println("ID\t깊이\t이름");
+            for (Category category : childCategories) {
+                System.out.printf("%d\t%d\t%s\n", 
+                    category.getId(),
+                    category.getDepth(),
+                    category.getName());
             }
         } catch (Exception e) {
-            System.out.println("카테고리 조회 실패: " + e.getMessage());
+            System.out.println("하위 카테고리를 가져오는 중 오류가 발생했습니다: " + e.getMessage());
         }
     }
-    
-    private void findRootCategories() {
-        System.out.println("\n=== 최상위 카테고리 조회 ===");
+
+    /**
+     * 카테고리 추가
+     */
+    private void addCategory(String userId) {
+        System.out.println("\n===== 카테고리 추가 =====");
+        
+        System.out.print("카테고리 이름: ");
+        String name = scanner.nextLine();
+        
+        System.out.print("상위 카테고리 ID (최상위면 그냥 엔터): ");
+        String parentIdStr = scanner.nextLine();
+        Long parentId = parentIdStr.isEmpty() ? null : Long.parseLong(parentIdStr);
         
         try {
-            List<Category> rootCategories = categoryService.findRootCategories();
-            System.out.println("최상위 카테고리 " + rootCategories.size() + "개를 찾았습니다:");
-            
-            for (Category category : rootCategories) {
-                printCategory(category);
+            Category newCategory = categoryService.create(name, userId, parentId);
+            System.out.println("카테고리가 성공적으로 추가되었습니다. ID: " + newCategory.getId());
+        } catch (IllegalArgumentException e) {
+            System.out.println("카테고리 추가 중 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 카테고리 수정
+     */
+    private void updateCategory(String userId) {
+        System.out.println("\n===== 카테고리 수정 =====");
+        
+        System.out.print("수정할 카테고리 ID: ");
+        Long categoryId = readLong();
+        
+        try {
+            // 기존 카테고리 정보 출력
+            try {
+                Category category = categoryService.findById(categoryId);
+                System.out.println("현재 이름: " + category.getName());
+                
+                if (!category.getUserId().equals(userId)) {
+                    System.out.println("해당 카테고리에 접근 권한이 없습니다.");
+                    return;
+                }
+            } catch (IllegalArgumentException e) {
+                System.out.println("해당 ID의 카테고리가 존재하지 않습니다.");
+                return;
             }
-        } catch (Exception e) {
-            System.out.println("카테고리 조회 실패: " + e.getMessage());
+            
+            System.out.print("새 카테고리 이름: ");
+            String name = scanner.nextLine();
+            
+            Category updatedCategory = categoryService.update(name, categoryId, userId);
+            System.out.println("카테고리가 성공적으로 수정되었습니다.");
+        } catch (IllegalArgumentException e) {
+            System.out.println("카테고리 수정 중 오류가 발생했습니다: " + e.getMessage());
         }
     }
-    
-    private void updateCategory() {
-        System.out.println("\n=== 카테고리 수정 ===");
-        Long id = getLongInput("수정할 카테고리 ID를 입력하세요: ");
+
+    /**
+     * 카테고리 삭제
+     */
+    private void deleteCategory(String userId) {
+        System.out.println("\n===== 카테고리 삭제 =====");
+        
+        System.out.print("삭제할 카테고리 ID: ");
+        Long categoryId = readLong();
         
         try {
-            Category category = categoryService.findById(id);
-            System.out.println("현재 카테고리 정보:");
-            printCategory(category);
-            
-            String newName = getStringInput("새 이름 (변경하지 않으려면 빈칸): ");
-            
-            if (!newName.isEmpty()) {
-                categoryService.updateName(id, newName);
-                System.out.println("카테고리 이름이 업데이트되었습니다:");
-                printCategory(categoryService.findById(id));
-            } else {
-                System.out.println("카테고리 정보가 변경되지 않았습니다.");
+            // 기존 카테고리 정보 출력
+            try {
+                Category category = categoryService.findById(categoryId);
+                System.out.println("삭제할 카테고리: " + category.getName() + " (ID: " + category.getId() + ")");
+                
+                if (!category.getUserId().equals(userId)) {
+                    System.out.println("해당 카테고리에 접근 권한이 없습니다.");
+                    return;
+                }
+            } catch (IllegalArgumentException e) {
+                System.out.println("해당 ID의 카테고리가 존재하지 않습니다.");
+                return;
             }
-        } catch (Exception e) {
-            System.out.println("카테고리 수정 실패: " + e.getMessage());
-        }
-    }
-    
-    private void deleteCategory() {
-        System.out.println("\n=== 카테고리 삭제 ===");
-        Long id = getLongInput("삭제할 카테고리 ID를 입력하세요: ");
-        
-        try {
-            Category category = categoryService.findById(id);
-            System.out.println("다음 카테고리를 삭제합니다:");
-            printCategory(category);
             
-            System.out.println("정말로 삭제하시겠습니까? (Y/N)");
-            boolean confirm = scanner.nextLine().trim().equalsIgnoreCase("Y");
+            System.out.print("정말로 삭제하시겠습니까? (y/n): ");
+            String confirm = scanner.nextLine().toLowerCase();
             
-            if (confirm) {
-                categoryService.delete(id);
+            if (confirm.equals("y")) {
+                categoryService.delete(categoryId, userId);
                 System.out.println("카테고리가 성공적으로 삭제되었습니다.");
             } else {
                 System.out.println("카테고리 삭제가 취소되었습니다.");
             }
-        } catch (Exception e) {
-            System.out.println("카테고리 삭제 실패: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            System.out.println("카테고리 삭제 중 오류가 발생했습니다: " + e.getMessage());
         }
     }
-    
-    private void listAllCategories() {
-        System.out.println("\n=== 모든 카테고리 목록 ===");
-        
+
+    /**
+     * 정수 입력 받기
+     */
+    private int readInt() {
         try {
-            List<Category> categories = categoryService.findAll();
-            System.out.println("총 " + categories.size() + "개의 카테고리가 있습니다:");
-            
-            for (Category category : categories) {
-                printCategory(category);
-            }
-        } catch (Exception e) {
-            System.out.println("카테고리 목록 조회 실패: " + e.getMessage());
+            int value = Integer.parseInt(scanner.nextLine());
+            return value;
+        } catch (NumberFormatException e) {
+            System.out.println("숫자를 입력해주세요.");
+            return readInt();
         }
     }
     
-    private void printCategory(Category category) {
-        System.out.println("----------------------------------------");
-        System.out.println("ID: " + category.getId());
-        System.out.println("이름: " + category.getName());
-        System.out.println("깊이: " + category.getDepth());
-        System.out.println("사용자 ID: " + category.getUserId());
-        System.out.println("상위 카테고리 ID: " + (category.getTargetCategoryId() == null ? "없음" : category.getTargetCategoryId()));
-        System.out.println("----------------------------------------");
-    }
-    
-    private String getStringInput(String prompt) {
-        System.out.print(prompt);
-        return scanner.nextLine().trim();
-    }
-    
-    private int getIntInput(String prompt) {
-        while (true) {
-            try {
-                System.out.print(prompt);
-                return Integer.parseInt(scanner.nextLine().trim());
-            } catch (NumberFormatException e) {
-                System.out.println("숫자를 입력해주세요.");
-            }
-        }
-    }
-    
-    private long getLongInput(String prompt) {
-        while (true) {
-            try {
-                System.out.print(prompt);
-                return Long.parseLong(scanner.nextLine().trim());
-            } catch (NumberFormatException e) {
-                System.out.println("숫자를 입력해주세요.");
-            }
+    /**
+     * 롱 정수 입력 받기
+     */
+    private Long readLong() {
+        try {
+            Long value = Long.parseLong(scanner.nextLine());
+            return value;
+        } catch (NumberFormatException e) {
+            System.out.println("숫자를 입력해주세요.");
+            return readLong();
         }
     }
 } 

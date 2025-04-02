@@ -46,10 +46,8 @@ CREATE TABLE `users` (
                          `id` VARCHAR(255) NOT NULL COMMENT '회원 식별 값',
                          `name` VARCHAR(100) NOT NULL COMMENT '이름',
                          `nickname` VARCHAR(100) NOT NULL COMMENT '닉네임',
-#                          `createdAt` DATETIME NOT NULL COMMENT '생성일',
-#                          `updatedAt` DATETIME NOT NULL COMMENT '수정일',
-#                          `deletedAt` DATETIME COMMENT '삭제일',
-#                          `isUsed` BOOLEAN NOT NULL COMMENT '삭제상태',
+                         `email` VARCHAR(255) NOT NULL COMMENT '회원 이메일',
+                         `password` VARCHAR(255) NOT NULL COMMENT '회원 식별 값',
 #                          UNIQUE KEY `uk_users_nickname` (`nickname`),
                          PRIMARY KEY (`id`)
 ) COMMENT = '회원';
@@ -59,10 +57,6 @@ CREATE TABLE `categories` (
                               `id` BIGINT AUTO_INCREMENT NOT NULL COMMENT '카테고리 식별값',
                               `name` VARCHAR(100) NOT NULL COMMENT '카테고리 제목',
                               `depth` INTEGER NOT NULL COMMENT '카테고리 깊이',
-#                               `createdAt` DATETIME NOT NULL COMMENT '생성일',
-#                               `updatedAt` DATETIME NOT NULL COMMENT '수정일',
-#                               `deletedAt` DATETIME COMMENT '삭제일',
-#                               `isUsed` BOOLEAN NOT NULL COMMENT '삭제상태',
                               `user_id` VARCHAR(255) NOT NULL COMMENT '회원 식별 값',
                               `target_category_id` BIGINT NULL COMMENT '참조 카테고리 식별값',
                               PRIMARY KEY (`id`)
@@ -75,10 +69,6 @@ CREATE TABLE `posts` (
                          `id` BIGINT AUTO_INCREMENT NOT NULL COMMENT '게시글 식별값',
                          `title` VARCHAR(255) NOT NULL COMMENT '제목',
                          `content` VARCHAR(4000) NOT NULL COMMENT '내용',
-#                          `createdAt` DATETIME NOT NULL COMMENT '생성일',
-#                          `updatedAt` DATETIME NOT NULL COMMENT '수정일',
-#                          `deletedAt` DATETIME COMMENT '삭제일',
-#                          `isUsed` BOOLEAN NOT NULL COMMENT '삭제상태',
                          `user_id` VARCHAR(255) NOT NULL COMMENT '회원 식별 값',
                          `category_id` BIGINT NOT NULL COMMENT '카테고리 식별값',
                          `is_public` BOOLEAN NOT NULL COMMENT '공개 여부',
@@ -91,10 +81,6 @@ CREATE TABLE `posts` (
 CREATE TABLE `comment` (
                             `id` BIGINT AUTO_INCREMENT NOT NULL COMMENT '댓글 식별값',
                             `content` LONGTEXT NOT NULL COMMENT '내용',
-#                             `createdAt` DATETIME NOT NULL COMMENT '생성일',
-#                             `updatedAt` DATETIME NOT NULL COMMENT '수정일',
-#                             `deletedAt` DATETIME COMMENT '삭제일',
-#                             `isUsed` BOOLEAN NOT NULL COMMENT '삭제상태',
                             `post_id` BIGINT NOT NULL COMMENT '게시글 식별값',
                             `user_id` VARCHAR(255) NOT NULL COMMENT '회원 식별 값',
                             PRIMARY KEY (`id`)
@@ -106,10 +92,6 @@ CREATE TABLE `comment` (
 CREATE TABLE `replies` (
                            `id` BIGINT AUTO_INCREMENT NOT NULL COMMENT '답글 식별값',
                            `content` LONGTEXT NOT NULL COMMENT '내용',
-#                            `createdAt` DATETIME NOT NULL COMMENT '생성일',
-#                            `updatedAt` DATETIME NOT NULL COMMENT '수정일',
-#                            `deletedAt` DATETIME COMMENT '삭제일',
-#                            `isUsed` BOOLEAN NOT NULL COMMENT '삭제상태',
                            `comment_id` BIGINT NOT NULL COMMENT '댓글 식별값',
                            `user_id` VARCHAR(255) NOT NULL COMMENT '회원 식별 값',
                            PRIMARY KEY (`id`)
@@ -122,7 +104,6 @@ CREATE TABLE `notifications` (
                                  `id` BIGINT AUTO_INCREMENT NOT NULL COMMENT '알림 식별값',
                                  `message` LONGTEXT NOT NULL COMMENT '내용',
                                  `state` BOOLEAN NOT NULL COMMENT '읽음 상태',
-#                                  `createdAt` DATETIME NOT NULL COMMENT '생성일',
                                  `user_id` VARCHAR(255) NOT NULL COMMENT '회원 식별 값',
                                  PRIMARY KEY (`id`)
 #                                  CONSTRAINT `fk_notifications_user_id__users_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
@@ -131,10 +112,6 @@ CREATE TABLE `notifications` (
 -- 7. subscriptions
 CREATE TABLE `subscriptions` (
                                  `id` BIGINT AUTO_INCREMENT NOT NULL COMMENT '구독 식별값',
-#                                  `createdAt` DATETIME NOT NULL COMMENT '생성일',
-#                                  `updatedAt` DATETIME NOT NULL COMMENT '수정일',
-#                                  `deletedAt` DATETIME COMMENT '삭제일',
-#                                      `isUsed` BOOLEAN NOT NULL COMMENT '삭제상태',
                                  `user_id` VARCHAR(255) NOT NULL COMMENT '회원 식별 값(누가)',
                                  `target_id` VARCHAR(255) NOT NULL COMMENT '회원 식별 값2(누구를)',
                                  `is_alram` BOOLEAN COMMENT '알림 여부',
@@ -159,10 +136,6 @@ CREATE TABLE `visitor` (
 CREATE TABLE `bookmarks` (
                              `id` BIGINT AUTO_INCREMENT NOT NULL COMMENT '즐겨찾기 식별값',
                              `name` LONGTEXT NOT NULL COMMENT '이름',
-#                              `createdAt` DATETIME NOT NULL COMMENT '생성일',
-#                              `updatedAt` DATETIME NOT NULL COMMENT '수정일',
-#                              `deletedAt` DATETIME COMMENT '삭제일',
-#                              `isUsed` BOOLEAN NOT NULL COMMENT '삭제상태',
                              `user_id` VARCHAR(255) NOT NULL COMMENT '회원 식별 값',
                              `post_id` BIGINT NOT NULL COMMENT '게시글 식별값',
                              PRIMARY KEY (`id`)

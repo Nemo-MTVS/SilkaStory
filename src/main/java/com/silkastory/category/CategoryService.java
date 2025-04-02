@@ -1,6 +1,10 @@
 package com.silkastory.category;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 public class CategoryService {
     private final CategoryRepository categoryRepository;
@@ -97,5 +101,45 @@ public class CategoryService {
     // 테스트 코드에서 사용하는 findByParentId 메서드 (findByChild와 동일한 기능)
     public List<Category> findByParentId(Long parentCategoryId) {
         return categoryRepository.findByTargetCategoryId(parentCategoryId);
+    }
+    
+    /**
+     * 사용자의 전체 카테고리 트리 구조 조회
+     * 
+     * @param userId 사용자 ID
+     * @return 계층 구조를 가진 카테고리 목록
+     */
+    public List<CategoryDTO> getCategoryTree(String userId) {
+        // 1. 모든 카테고리를 가져와서 DTO로 변환
+        List<Category> allCategories = categoryRepository.findAll()
+            .stream()
+            .filter(category -> category.getUserId().equals(userId))
+            .collect(Collectors.toList());
+        
+        // 2. ID를 키로 하는 맵 생성
+        Map<Long, CategoryDTO> categoryMap = new HashMap<>();
+        for (Category category : allCategories) {
+            categoryMap.put(category.getId(), new CategoryDTO(category));
+        }
+        
+        // 3. 트리 구조 구성
+        List<CategoryDTO> rootCategories = new ArrayList<>();
+        
+        for (Category category : allCategories) {
+            CategoryDTO dto = categoryMap.get(category.getId());
+            
+            if (category.getTargetCategoryId() == null) {
+                // 최상위 카테고리인 경우
+                rootCategories.add(dto);
+            } else {
+                // 하위 카테고리인 경우
+                CategoryDTO parentDto = categoryMap.get(category.getTargetCategoryId());
+                if (parentDto != null) {
+                    parentDto.addChild(dto);
+                }
+            }
+        }
+        
+        return rootCategories;
     }
 }

@@ -21,8 +21,4 @@ public class ReplyService {
         return replyDAO.getRepliesByComment(commentId);
     }
 
-    // 답글 삭제 (소프트 삭제)
-    public void removeReply(Long replyId) {
-        replyDAO.deleteReply(replyId);
-    }
 }

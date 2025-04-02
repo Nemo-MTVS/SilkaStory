@@ -39,10 +39,6 @@ public class ReplyDAO {
                 replies.add(new Reply(
                         rs.getLong("id"),
                         rs.getString("content"),
-                        rs.getString("createdAt"),
-                        rs.getString("updatedAt"),
-                        rs.getString("deletedAt"),
-                        rs.getBoolean("isUsed"),
                         rs.getLong("comment_id"),
                         rs.getString("user_id")
                 ));
@@ -53,15 +49,4 @@ public class ReplyDAO {
         return replies;
     }
 
-    // 답글 삭제 (소프트 삭제)
-    public void deleteReply(Long replyId) {
-        String sql = "UPDATE replies SET isUsed = TRUE, deletedAt = NOW() WHERE id = ?";
-        try (Connection conn = jdbcConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setLong(1, replyId);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
 }
