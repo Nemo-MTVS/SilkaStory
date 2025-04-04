@@ -35,16 +35,16 @@ public class PostDAO {
     /**
      * 모든 게시글 조회
      */
-    public List<Post> getAllPosts() throws SQLException {
-        String sql = "SELECT * FROM posts";
-        List<Post> posts = new ArrayList<>();
+    public List<PostDTO> getAllPosts() throws SQLException {
+        String sql = "SELECT * FROM posts join users on posts.user_id = users.id join categories on posts.category_id = categories.id";
+        List<PostDTO> posts = new ArrayList<>();
         
         try (Connection conn = JDBCConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
             
             while (rs.next()) {
-                Post post = mapResultSetToPost(rs);
+                PostDTO post = mapResultSetToPostDTO(rs);
                 posts.add(post);
             }
         }
@@ -150,6 +150,18 @@ public class PostDAO {
         }
         
         return posts;
+    }
+
+
+    private PostDTO mapResultSetToPostDTO(ResultSet rs) throws SQLException {
+        PostDTO post = new PostDTO();
+        post.setId(rs.getInt("id"));
+        post.setTitle(rs.getString("title"));
+        post.setContent(rs.getString("content"));
+        post.setWriter(rs.getString("users.nickname"));
+        post.setCategoryName(rs.getString("categories.name"));
+
+        return post;
     }
     
     /**

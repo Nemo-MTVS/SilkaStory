@@ -1,5 +1,13 @@
 package com.silkastory.post;
 
+import com.silkastory.common.RepositoryFactory;
+import com.silkastory.notifications.NotificationsRepository;
+import com.silkastory.notifications.NotificationsService;
+import com.silkastory.subscriptions.SubscriptionsRepository;
+import com.silkastory.subscriptions.SubscriptionsService;
+import com.silkastory.users.Users;
+import com.silkastory.users.UsersDao;
+
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -13,11 +21,30 @@ public class PostView {
     private final PostService postService;
     private final Scanner scanner;
     private final SimpleDateFormat dateFormat;
+    private final SubscriptionsService subscriptionsService;
+    private final NotificationsService notificationsService;
+    private final UsersDao usersDao;
 
     public PostView(PostService postService, Scanner scanner) {
+        this.usersDao = new UsersDao();
+        this.subscriptionsService = new SubscriptionsService(RepositoryFactory.getRepository(SubscriptionsRepository.class));
+        this.notificationsService = new NotificationsService(RepositoryFactory.getRepository(NotificationsRepository.class), subscriptionsService);
         this.postService = postService;
         this.scanner = scanner;
         this.dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    }
+
+    public void printMenus() {
+        System.out.println("\n===== 게시글 관리 =====");
+        System.out.println("1. 게시글 목록 보기");
+        System.out.println("2. 게시글 상세 보기");
+        System.out.println("3. 게시글 작성하기");
+        System.out.println("4. 게시글 수정하기");
+        System.out.println("5. 게시글 삭제하기");
+        System.out.println("6. 내 게시글 보기");
+        System.out.println("7. 카테고리별 게시글 보기");
+        System.out.println("0. 돌아가기");
+        System.out.print("메뉴 선택: ");
     }
 
     /**
@@ -29,16 +56,7 @@ public class PostView {
         boolean running = true;
         
         while (running) {
-            System.out.println("\n===== 게시글 관리 =====");
-            System.out.println("1. 게시글 목록 보기");
-            System.out.println("2. 게시글 상세 보기");
-            System.out.println("3. 게시글 작성하기");
-            System.out.println("4. 게시글 수정하기");
-            System.out.println("5. 게시글 삭제하기");
-            System.out.println("6. 내 게시글 보기");
-            System.out.println("7. 카테고리별 게시글 보기");
-            System.out.println("0. 돌아가기");
-            System.out.print("메뉴 선택: ");
+            printMenus();
             
             int choice = readInt();
             
@@ -79,19 +97,21 @@ public class PostView {
     private void showPostList() {
         System.out.println("\n===== 게시글 목록 =====");
         try {
-            List<Post> posts = postService.getAllPosts();
+            List<PostDTO> posts = postService.getAllPosts();
             
             if (posts.isEmpty()) {
                 System.out.println("게시글이 없습니다.");
                 return;
             }
             
-            System.out.println("번호\t제목\t작성자\t작성일");
-            for (Post post : posts) {
-                System.out.printf("%d\t%s\t%s\t\\n",
+            System.out.println("번호\t제목\t작성자\t카테고리명");
+            for (PostDTO post : posts) {
+                System.out.printf("%d\t%s\t%s\t%s\\n",
                     post.getId(), 
-                    post.getTitle(), 
-                    post.getUserId());
+                    post.getTitle(),
+                    post.getWriter(),
+                    post.getCategoryName()
+                );
             }
         } catch (SQLException e) {
             System.out.println("게시글 목록을 가져오는 중 오류가 발생했습니다: " + e.getMessage());
@@ -134,7 +154,13 @@ public class PostView {
         int categoryId = readInt();
         
         try {
+
             boolean success = postService.addPost(userId, title, content, categoryId);
+            // 구독자 목록 호출
+            // 알림 발송
+            Users user = usersDao.getUserById(userId);
+
+            notificationsService.sendNotificationToSubscribers(user.getNickname() + "님이 새로운 게시글을 작성하였습니다", userId);
             if (success) {
                 System.out.println("게시글이 성공적으로 작성되었습니다.");
             } else {
